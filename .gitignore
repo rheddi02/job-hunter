@@ -1,0 +1,27 @@
+node_modules
+
+# env files
+.env
+.env.*
+!.env.example
+
+# Next.js
+.next
+out
+
+# Build outputs
+dist
+*.tsbuildinfo
+
+# Prisma generated client
+packages/db/generated
+
+# Turbo
+.turbo
+
+# Supabase local
+supabase/.branches
+supabase/.temp
+
+# OS
+.DS_Store
