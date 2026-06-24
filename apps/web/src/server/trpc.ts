@@ -1,8 +1,13 @@
-import { initTRPC } from '@trpc/server'
+import { initTRPC, TRPCError } from '@trpc/server'
 import { ZodError } from 'zod'
+import { createClient } from '@/lib/supabase/server'
 
-export const createTRPCContext = async () => {
-  return {}
+export const createTRPCContext = async (opts: { req: Request }) => {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  return { user, req: opts.req }
 }
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
@@ -19,3 +24,10 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
 
 export const createTRPCRouter = t.router
 export const publicProcedure = t.procedure
+
+export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
+  if (!ctx.user) {
+    throw new TRPCError({ code: 'UNAUTHORIZED' })
+  }
+  return next({ ctx: { ...ctx, user: ctx.user } })
+})
