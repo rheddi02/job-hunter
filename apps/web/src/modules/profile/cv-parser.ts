@@ -38,6 +38,7 @@ export async function parseCvFromBuffer(pdfBuffer: Buffer): Promise<ParsedResume
     throw new Error('Unexpected response shape from Claude')
   }
 
-  const raw: unknown = JSON.parse(block.text)
+  const jsonText = block.text.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '')
+  const raw: unknown = JSON.parse(jsonText)
   return ParsedResumeSchema.parse(raw)
 }
