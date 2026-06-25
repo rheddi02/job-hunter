@@ -1,11 +1,16 @@
 'use client'
 
 import * as React from 'react'
+import { Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 type LoginState = 'idle' | 'loading' | 'sent' | 'error'
 
-export default function LoginPage() {
+function LoginForm() {
+  const searchParams = useSearchParams()
+  const isUnauthorized = searchParams.get('error') === 'unauthorized'
+
   const [email, setEmail] = React.useState('')
   const [state, setState] = React.useState<LoginState>('idle')
   const [errorMsg, setErrorMsg] = React.useState('')
@@ -36,6 +41,12 @@ export default function LoginPage() {
           <h1 className="text-lg font-semibold text-text-primary">JobPilot</h1>
           <p className="mt-1 text-sm text-text-secondary">Enter your email to sign in.</p>
         </div>
+
+        {isUnauthorized && (
+          <div className="rounded-md border border-danger/30 bg-danger/10 p-4 text-sm text-danger">
+            This app is private. Sign in with the authorized account.
+          </div>
+        )}
 
         {state === 'sent' ? (
           <div className="rounded-md border border-success/30 bg-success/10 p-4 text-sm text-text-primary">
@@ -73,5 +84,13 @@ export default function LoginPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   )
 }

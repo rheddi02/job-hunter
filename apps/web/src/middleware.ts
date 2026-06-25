@@ -35,6 +35,14 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
+  const allowedEmail = process.env.ALLOWED_EMAIL
+  if (user && allowedEmail && user.email !== allowedEmail) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/auth/signout'
+    url.search = '?redirectTo=%2Flogin%3Ferror%3Dunauthorized'
+    return NextResponse.redirect(url)
+  }
+
   if (user && pathname === '/login') {
     const url = request.nextUrl.clone()
     url.pathname = '/profile'
