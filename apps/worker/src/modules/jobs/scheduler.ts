@@ -24,7 +24,10 @@ export async function setupSchedulers(): Promise<void> {
       { every: intervalMinutes * 60 * 1000 },
       { data: { sourceId: source.id } },
     )
+
+    // Run once immediately on startup so the first poll doesn't wait a full interval
+    await ingestionQueue.add('ingest-now', { sourceId: source.id })
   }
 
-  console.log(`[scheduler] registered ${sources.length} source(s)`)
+  console.log(`[scheduler] registered ${sources.length} source(s) — queued immediate run for each`)
 }
